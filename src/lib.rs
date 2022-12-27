@@ -31,7 +31,7 @@ impl <T: Read> UntilReader for BufReader<T> {
                 }
             } else {
                 // Just read the rest of the buffer
-                todo!();
+                todo!("I don't even think this is necessary");
             }
         }
 
