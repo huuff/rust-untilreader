@@ -50,7 +50,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn correctly_gets_crlf_line() {
+    fn read_crlf_line() {
         // ARRANGE
         let mut buf = Vec::new();
         let mut buf_reader = BufReader::new(
@@ -60,6 +60,9 @@ mod tests {
         // ACT
         let result = buf_reader.read_until_string("\r\n", &mut buf);
 
+        // ASSERT
         assert!(result.is_ok());
+        assert_eq!(result.unwrap(), 16);
+        assert_eq!(String::from_utf8(buf).unwrap(), "This is a text\r\n");
     }
 }
