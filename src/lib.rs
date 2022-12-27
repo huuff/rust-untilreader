@@ -44,3 +44,22 @@ impl <T: Read> UntilReader for BufReader<T> {
 
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn correctly_gets_crlf_line() {
+        // ARRANGE
+        let mut buf = Vec::new();
+        let mut buf_reader = BufReader::new(
+            "This is a text\r\nwith two lines".as_bytes()
+        );
+
+        // ACT
+        let result = buf_reader.read_until_string("\r\n", &mut buf);
+
+        assert!(result.is_ok());
+    }
+}
