@@ -38,7 +38,7 @@ impl <T: Read> UntilReader for BufReader<T> {
             }
         }
 
-        // TOO: Uuuh was a string in my original one
+        // TODO: Uuuh was a string in my original one
         buf.push_str(str::from_utf8(&fill_buf[..consumed]).unwrap());
         self.consume(consumed);
         return Ok(consumed);
