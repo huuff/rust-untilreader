@@ -1,14 +1,7 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use std::io::Result;
+
+pub trait UntilReader {
+    fn read_until_string(&mut self, ending: &str, buf: Vec<u8>) -> Result<usize>;
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
