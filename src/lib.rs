@@ -2,11 +2,11 @@ use std::io::{ Result, BufReader, Read, BufRead, };
 use std::str;
 
 pub trait UntilReader {
-    fn read_until_string(&mut self, ending: &str, buf: Vec<u8>) -> Result<usize>;
+    fn read_until_string(&mut self, ending: &str, buf: &mut Vec<u8>) -> Result<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
-    fn read_until_string(&mut self, ending: &str, buf: Vec<u8>) -> Result<usize> {
+    fn read_until_string(&mut self, ending: &str, buf: &mut Vec<u8>) -> Result<usize> {
         let fill_buf = self.fill_buf()?;
 
         if fill_buf.is_empty() {
@@ -38,8 +38,7 @@ impl <T: Read> UntilReader for BufReader<T> {
             }
         }
 
-        // TODO: Uuuh was a string in my original one
-        buf.push_str(str::from_utf8(&fill_buf[..consumed]).unwrap());
+        buf.extend_from_slice(&fill_buf[..consumed]);
         self.consume(consumed);
         return Ok(consumed);
 
