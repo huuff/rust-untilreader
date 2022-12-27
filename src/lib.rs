@@ -1,12 +1,11 @@
 use std::io::{ Result, BufReader, Read, BufRead, };
-use std::str;
 
 pub trait UntilReader {
-    fn read_until_string(&mut self, ending: &str, buf: &mut Vec<u8>) -> Result<usize>;
+    fn read_until_string(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> Result<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
-    fn read_until_string(&mut self, ending: &str, buf: &mut Vec<u8>) -> Result<usize> {
+    fn read_until_string(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> Result<usize> {
         let fill_buf = self.fill_buf()?;
 
         if fill_buf.is_empty() {
@@ -14,6 +13,7 @@ impl <T: Read> UntilReader for BufReader<T> {
         }
 
         let mut consumed = 0;
+        // TODO: Can I use a while?
         loop {
             // The buffer is finished, so we can just break
             if consumed == fill_buf.len() {
@@ -24,9 +24,6 @@ impl <T: Read> UntilReader for BufReader<T> {
             if consumed <= (fill_buf.len() - ending.len()) {
                 // Then check wether the next few bytes are the string we're looking for
                 let next_str = &fill_buf[consumed..(consumed+ending.len())];
-                // TODO: No unwrapping!
-                // TODO: Might be better if I just convert the ending to a byte array?
-                let next_str = str::from_utf8(next_str).unwrap();
                 consumed += ending.len();
                 
                 if next_str == ending {
@@ -58,11 +55,11 @@ mod tests {
         );
 
         // ACT
-        let result = buf_reader.read_until_string("\r\n", &mut buf);
+        let result = buf_reader.read_until_string("\r\n".as_bytes(), &mut buf);
 
         // ASSERT
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), 16);
         assert_eq!(String::from_utf8(buf).unwrap(), "This is a text\r\n");
+        assert_eq!(result.unwrap(), 16);
     }
 }
