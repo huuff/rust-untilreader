@@ -42,6 +42,7 @@ impl <T: Read> UntilReader for BufReader<T> {
     }
 }
 
+// TODO: Port al tests from `crlf` (the current one is the first one from crlf)
 #[cfg(test)]
 mod tests {
     use super::*;
