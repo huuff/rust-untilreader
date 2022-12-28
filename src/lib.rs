@@ -50,6 +50,32 @@ impl <T: Read> UntilReader for BufReader<T> {
         // TODO: Something better than unwrapping the option? But passing an empty array is a
         // serious oversight
         let longest_ending_bytes = endings.iter().map(|it| it.len()).reduce(|max, it| std::cmp::max(max, it)).unwrap();
+
+        let mut consumed = 0;
+        'outer: loop {
+            if consumed == fill_buf.len() {
+                break;
+            }
+
+            // TODO: Maybe I should use the shorter ending?
+            // The remainings of the buffer are longer than or equal to the string we're looking for
+            if consumed <= (fill_buf.len() - longest_ending_bytes) {
+                // Then check wether the next few bytes are the string we're looking for
+                for ending in endings {
+                    let next_str = &fill_buf[consumed..(consumed+ending.len())];
+                    consumed += ending.len();
+                    
+                    if *next_str == **ending {
+                        break 'outer;
+                    }
+
+                }
+            } else {
+                // Just read the rest of the buffer
+                consumed = fill_buf.len();
+            }
+        }
+
         todo!("Finish it");
     }
 }
