@@ -169,17 +169,23 @@ mod tests {
 
     #[test]
     fn reading_until_crlf_or_newline() -> Result<(), Box<dyn Error>> {
-        // ARRANGE
         let mut buf: Vec<u8> = Vec::new();
         let mut buf_reader = BufReader::new(
             "these are three lines\r\nseparated by different\nnewline types".as_bytes()
         );
 
-        // ACT
-        let result = buf_reader.read_until_either_bytes(&["\r\n".as_bytes(), "\n".as_bytes()], &mut buf);
-        assert!(result.is_ok());
-        assert_eq!(String::from_utf8(buf)?, "these are three lines\r\n");
-        assert_eq!(result?, 23);
+        let endings = ["\r\n".as_bytes(), "\n".as_bytes()];
+
+        let first_result = buf_reader.read_until_either_bytes(&endings, &mut buf);
+        assert!(first_result.is_ok());
+        assert_eq!(String::from_utf8(buf.clone())?, "these are three lines\r\n");
+        assert_eq!(first_result?, 23);
+
+        buf.clear();
+
+        let second_result = buf_reader.read_until_either_bytes(&endings, &mut buf);
+        assert!(second_result.is_ok());
+        assert_eq!(String::from_utf8(buf)?, "separated by different\n");
 
         Ok(())
     }
