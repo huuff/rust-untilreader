@@ -2,6 +2,7 @@ use std::io::{ Result as IoResult, BufReader, Read, BufRead, };
 
 pub trait UntilReader {
     fn read_until_bytes(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> IoResult<usize>;
+    fn read_until_either_bytes(&mut self, ending: &[Box<u8>], buf: &mut Vec<u8>) -> IoResult<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
@@ -37,7 +38,10 @@ impl <T: Read> UntilReader for BufReader<T> {
         buf.extend_from_slice(&fill_buf[..consumed]);
         self.consume(consumed);
         return Ok(consumed);
+    }
 
+    fn read_until_either_bytes(&mut self, ending: &[Box<u8>], buf: &mut Vec<u8>) -> IoResult<usize> {
+       todo!("Actual implementation"); 
     }
 }
 
