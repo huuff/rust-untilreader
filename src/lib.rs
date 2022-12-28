@@ -57,9 +57,10 @@ impl <T: Read> UntilReader for BufReader<T> {
                 break;
             }
 
-            // The remainings of the buffer are longer than or equal to the string we're looking for
+            // The remainings of the buffer are longer or equal to some of the endings we're looking for
+            // so they might be found
             if consumed <= (fill_buf.len() - shortest_ending_bytes) {
-                // Then check wether the next few bytes are the string we're looking for
+                // We check for all endings that can happen at the current point
                 let valid_endings_for_current_length = endings.iter().filter(|it| it.len() < fill_buf.len() - consumed);
                 for ending in valid_endings_for_current_length {
                     let next_str = &fill_buf[consumed..(consumed+ending.len())];
