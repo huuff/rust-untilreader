@@ -2,8 +2,7 @@ use std::io::{ Result as IoResult, BufReader, Read, BufRead, };
 
 pub trait UntilReader {
     fn read_until_bytes(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> IoResult<usize>;
-    // TODO: Far too many pointers... can I drop the box?
-    fn read_until_either_bytes(&mut self, endings: &[Box<&[u8]>], buf: &mut Vec<u8>) -> IoResult<usize>;
+    fn read_until_either_bytes(&mut self, endings: &[&[u8]], buf: &mut Vec<u8>) -> IoResult<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
@@ -41,7 +40,7 @@ impl <T: Read> UntilReader for BufReader<T> {
         return Ok(consumed);
     }
 
-    fn read_until_either_bytes(&mut self, endings: &[Box<&[u8]>], buf: &mut Vec<u8>) -> IoResult<usize> {
+    fn read_until_either_bytes(&mut self, endings: &[&[u8]], buf: &mut Vec<u8>) -> IoResult<usize> {
         let fill_buf = self.fill_buf()?;
 
         if fill_buf.is_empty() {
@@ -66,7 +65,7 @@ impl <T: Read> UntilReader for BufReader<T> {
                     let next_str = &fill_buf[consumed..(consumed+ending.len())];
                     consumed += ending.len();
                     
-                    if *next_str == ***ending {
+                    if *next_str == **ending {
                         break 'outer;
                     }
 
@@ -177,7 +176,7 @@ mod tests {
         );
 
         // ACT
-        let result = buf_reader.read_until_either_bytes(&[Box::new("\r\n".as_bytes()), Box::new("\n".as_bytes())], &mut buf);
+        let result = buf_reader.read_until_either_bytes(&["\r\n".as_bytes(), "\n".as_bytes()], &mut buf);
         assert!(result.is_ok());
         assert_eq!(String::from_utf8(buf)?, "these are three lines\r\n");
         assert_eq!(result?, 23);
