@@ -1,8 +1,11 @@
 use std::io::{ Result as IoResult, BufReader, Read, BufRead, };
+use regex::Regex;
 
 pub trait UntilReader {
     fn read_until_bytes(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> IoResult<usize>;
     fn read_until_either_bytes(&mut self, endings: &[&[u8]], buf: &mut Vec<u8>) -> IoResult<usize>;
+    // TODO: Maybe this one should be behind a feature flag
+    fn read_until_regex(&mut self, regex: &Regex, buf: &mut Vec<u8>) -> IoResult<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
@@ -84,6 +87,11 @@ impl <T: Read> UntilReader for BufReader<T> {
         buf.extend_from_slice(&fill_buf[..consumed]);
         self.consume(consumed);
         return Ok(consumed);
+    }
+
+    fn read_until_regex(&mut self, regex: &Regex, buf: &mut Vec<u8>) -> IoResult<usize> {
+        
+        todo!("Actually implement");
     }
 }
 
