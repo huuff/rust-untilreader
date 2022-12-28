@@ -2,7 +2,7 @@ use std::io::{ Result as IoResult, BufReader, Read, BufRead, };
 
 pub trait UntilReader {
     fn read_until_bytes(&mut self, ending: &[u8], buf: &mut Vec<u8>) -> IoResult<usize>;
-    fn read_until_either_bytes(&mut self, ending: &[Box<u8>], buf: &mut Vec<u8>) -> IoResult<usize>;
+    fn read_until_either_bytes(&mut self, endings: &[Box<[u8]>], buf: &mut Vec<u8>) -> IoResult<usize>;
 }
 
 impl <T: Read> UntilReader for BufReader<T> {
@@ -40,8 +40,17 @@ impl <T: Read> UntilReader for BufReader<T> {
         return Ok(consumed);
     }
 
-    fn read_until_either_bytes(&mut self, ending: &[Box<u8>], buf: &mut Vec<u8>) -> IoResult<usize> {
-       todo!("Actual implementation"); 
+    fn read_until_either_bytes(&mut self, endings: &[Box<[u8]>], buf: &mut Vec<u8>) -> IoResult<usize> {
+        let fill_buf = self.fill_buf()?;
+
+        if fill_buf.is_empty() {
+            return Ok(0);
+        }
+
+        // TODO: Something better than unwrapping the option? But passing an empty array is a
+        // serious oversight
+        let longest_ending_bytes = endings.iter().map(|it| it.len()).reduce(|max, it| std::cmp::max(max, it)).unwrap();
+        todo!("Finish it");
     }
 }
 
