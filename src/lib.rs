@@ -42,7 +42,6 @@ impl <T: Read> UntilReader for BufReader<T> {
     }
 }
 
-// TODO: Port al tests from `crlf` (the current one is the first one from crlf)
 // TODO: Remove unwraps from tests (return results)
 #[cfg(test)]
 mod tests {
@@ -83,5 +82,22 @@ mod tests {
         assert!(second_result.is_ok());
         assert_eq!(String::from_utf8(buf).unwrap(), "with three lines\r\n");
         assert_eq!(second_result.unwrap(), 18);
+    }
+
+    #[test]
+    fn read_to_end_when_ending_wasnt_found() {
+        // ARRANGE
+        let mut buf = Vec::new();
+        let mut buf_reader = BufReader::new(
+            "this is\nseveral lines\nseparated by newlines\nwithout carriage return".as_bytes()
+        );
+
+        // ACT
+        let result = buf_reader.read_until_bytes("\r\n".as_bytes(), &mut buf);
+
+        // ASSERT
+        assert!(result.is_ok());
+        assert_eq!(String::from_utf8(buf).unwrap(), "this is\nseveral lines\nseparated by newlines\nwithout carriage return");
+        assert_eq!(result.unwrap(), 67);
     }
 }
