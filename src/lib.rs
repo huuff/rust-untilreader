@@ -105,4 +105,23 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn reading_until_a_longer_string() -> Result<(), Box<dyn Error>> {
+        // ARRANGE
+        let mut buf = Vec::new();
+        let mut buf_reader = BufReader::new(
+            "these are two lines abcd separated by abcd".as_bytes()
+        );
+
+        // ACT
+        let result = buf_reader.read_until_bytes("abcd".as_bytes(), &mut buf);
+
+        // ASSERT
+        assert!(result.is_ok());
+        assert_eq!(String::from_utf8(buf)?, "these are two lines abcd");
+        assert_eq!(result?, 24);
+
+        Ok(())
+    }
 }
