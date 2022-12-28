@@ -180,6 +180,7 @@ mod tests {
         let result = buf_reader.read_until_either_bytes(&[Box::new("\r\n".as_bytes()), Box::new("\n".as_bytes())], &mut buf);
         assert!(result.is_ok());
         assert_eq!(String::from_utf8(buf)?, "these are three lines\r\n");
+        assert_eq!(result?, 23);
 
         Ok(())
     }
