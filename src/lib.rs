@@ -49,7 +49,7 @@ impl <T: Read> UntilReader for BufReader<T> {
 
         // TODO: Something better than unwrapping the option? But passing an empty array is a
         // serious oversight
-        let longest_ending_bytes = endings.iter().map(|it| it.len()).reduce(|max, it| std::cmp::max(max, it)).unwrap();
+        let shortest_ending_bytes = endings.iter().map(|it| it.len()).reduce(|min, it| std::cmp::min(min, it)).unwrap();
 
         let mut consumed = 0;
         'outer: loop {
@@ -57,19 +57,22 @@ impl <T: Read> UntilReader for BufReader<T> {
                 break;
             }
 
-            // TODO: Maybe I should use the shorter ending?
             // The remainings of the buffer are longer than or equal to the string we're looking for
-            if consumed <= (fill_buf.len() - longest_ending_bytes) {
+            if consumed <= (fill_buf.len() - shortest_ending_bytes) {
                 // Then check wether the next few bytes are the string we're looking for
-                for ending in endings {
+                let valid_endings_for_current_length = endings.iter().filter(|it| it.len() < fill_buf.len() - consumed);
+                for ending in valid_endings_for_current_length {
                     let next_str = &fill_buf[consumed..(consumed+ending.len())];
-                    consumed += ending.len();
                     
                     if *next_str == **ending {
+                        consumed += ending.len();
                         break 'outer;
                     }
 
                 }
+
+                // We haven't broken before, so we consume the shortest ending
+                consumed += shortest_ending_bytes;
             } else {
                 // Just read the rest of the buffer
                 consumed = fill_buf.len();
