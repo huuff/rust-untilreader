@@ -75,7 +75,7 @@ impl <T: Read> UntilReader for BufReader<T> {
 
                 }
 
-                // We haven't broken before, so we consume the shortest ending
+                // We haven't broken out before, so we consume the shortest ending
                 consumed += shortest_ending_bytes;
             } else {
                 // Just read the rest of the buffer
