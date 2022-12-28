@@ -13,7 +13,6 @@ impl <T: Read> UntilReader for BufReader<T> {
         }
 
         let mut consumed = 0;
-        // TODO: Can I use a while?
         loop {
             // The buffer is finished, so we can just break
             if consumed == fill_buf.len() {
